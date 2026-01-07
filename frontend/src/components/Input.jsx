@@ -2,7 +2,6 @@ const Input = ({
   type = "text",
   placeholder = "this is placeholder",
   className = "hey",
-  name = "name is not given",
   ...props
 }) => {
   return (
