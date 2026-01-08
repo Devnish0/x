@@ -46,7 +46,6 @@ const AuthPage = ({ mode }) => {
                       type="text"
                       placeholder="first name"
                       className="w-1/2"
-                      s
                       name="firstname"
                     />
                     <Input
