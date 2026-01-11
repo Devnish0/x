@@ -24,9 +24,7 @@ export const Index = () => {
         setInput(posts);
       } catch (error) {
         setError(error);
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
+        navigate("/login");
       } finally {
         setLoading(false);
       }
