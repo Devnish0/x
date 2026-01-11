@@ -63,7 +63,6 @@ const AuthPage = ({ mode }) => {
                 setLoading(true);
                 e.preventDefault();
                 const data = Object.fromEntries(new FormData(e.target));
-                // console.log(data);
                 try {
                   const response = await api.post(
                     isLogin ? "/api/login" : "/api/signup",
