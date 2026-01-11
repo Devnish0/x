@@ -15,7 +15,6 @@ export const Index = () => {
 
   const [input, setInput] = useState([]);
   const [show, setShow] = useState(false);
-  console.log("input", input);
   useEffect(() => {
     const fetchposts = async () => {
       try {
@@ -75,7 +74,6 @@ export const Index = () => {
             <span> Following</span>
             <span> Build in public</span>
           </div>
-          {console.log(input)}
           <div className="h-full w-full">
             {input.length === 0 ? (
               <div className="flex h-full items-center justify-center">
@@ -87,7 +85,8 @@ export const Index = () => {
                   <Post
                     key={post._id}
                     input={post}
-                    isVerified={post?.user?.isAdmin === true} // Use === true for boolean check
+                    isVerified={post?.user?.isAdmin === true}
+                    useIndex={false} // Use === true for boolean check
                   />
                 );
               })

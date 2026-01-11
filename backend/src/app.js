@@ -167,10 +167,43 @@ app.get("/api/index", protectedroute, async (req, res) => {
   try {
     const posts = await postModel
       .find()
-      .populate("user", "username name")
+      .populate("user", "username name isAdmin")
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, posts }); // Fixed typo: sucess → success
   } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
+  try {
+    const { id } = req.params; // Extract id from params object
+
+    // Check if post exists and user owns it
+    const post = await postModel.findById(id);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Post not found" });
+    }
+
+    // Verify user owns the post
+    if (post.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: "Unauthorized" });
+    }
+
+    // Delete post
+    await postModel.findByIdAndDelete(id);
+
+    // Remove post ID from user's posts array
+    await userModel.findByIdAndUpdate(
+      req.user._id,
+      { $pull: { posts: id } },
+      { new: true }
+    );
+
+    res.status(200).json({ success: true, message: "Post deleted" });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

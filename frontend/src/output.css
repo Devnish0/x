@@ -24,6 +24,8 @@
     --color-white: #fff;
     --spacing: 0.25rem;
     --container-6xl: 72rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
     --text-sm: 0.875rem;
     --text-sm--line-height: calc(1.25 / 0.875);
     --text-base: 1rem;
@@ -345,6 +347,9 @@
   .h-\[90\%\] {
     height: 90%;
   }
+  .h-\[100\%\] {
+    height: 100%;
+  }
   .h-\[140\%\] {
     height: 140%;
   }
@@ -635,6 +640,10 @@
   .text-sm {
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xs {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
   }
   .text-\[10px\] {
     font-size: 10px;

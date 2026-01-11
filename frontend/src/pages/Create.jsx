@@ -19,7 +19,7 @@ const Create = ({ oncross, name = "hey there", onpost }) => {
     <div className="w-full h-screen bg-[#191919] px-4 fixed z-2 text-white pt-3">
       <div className="flex items-center  justify-between  h-12 ">
         <button onClick={oncross} className="h-full flex items-center">
-          <img src={cross} alt="" className="h-[70%]" srcset="" />
+          <img src={cross} alt="" className="h-[70%]" srcSet="" />
         </button>
         <span>
           <button

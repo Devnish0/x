@@ -1,60 +1,87 @@
 import React from "react";
 import defaultpfp from "../assets/defaultpfp.png";
-import correctpng from "../assets/correct.png";
 import commentpng from "../assets/comment.png";
 import love from "../assets/love.png";
 import share from "../assets/share.png";
 import bin from "../assets/bin.png";
-
 import liked from "../assets/liked.png";
+import correctpng from "../assets/correct.png";
+import api from "../services/axios";
 
-export const Post = ({ input = "error", isVerified }) => {
+export const Post = ({ input = "error", isVerified, useIndex = true }) => {
   const { name, username } = input?.user;
-  const { comments, createdAt, likes, data } = input;
-  console.log(input, isVerified);
+  const { comments = [], createdAt, likes = [], data } = input;
+
+  const timeAgoShort = (date) => {
+    const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (seconds < 60) return "now";
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    const weeks = Math.floor(days / 7);
+    return `${weeks}w`;
+  };
+
   return (
-    <div className="flex  h-auto w-full px-3 bg-[#191919] py-2 border-b border-zinc-600">
-      <div className=" h-full w-12 ">
-        <div className="  flex justify-center items-center">
-          <img src={defaultpfp} alt="" className=" rounded-full" />
+    <div className="flex h-auto w-full px-3 bg-[#191919] py-2 border-b border-zinc-600">
+      <div className="h-full w-12">
+        <div className="flex justify-center items-center">
+          <img src={defaultpfp} alt="" className="rounded-full" />
         </div>
       </div>
       <div className="w-full">
-        <div className="h-5 px-1 flex items-center  justify-between  w-full">
-          <div className="w-full h-full flex gap-2 items-center  ">
+        <div className="h-5 px-1 flex items-center justify-between w-full">
+          <div className="w-full h-full flex gap-2 items-center">
             <span className="h-full gap-1 items-center flex">
               <span className="font-semibold">{name}</span>
               {isVerified && (
                 <span className="h-full flex items-center">
-                  <img src={correctpng} className=" h-[60%]  " alt="" />
+                  <img src={correctpng} className="h-5 w-5" alt="verified" />
                 </span>
               )}
             </span>
-            <span className="text-zinc-400">{username}</span>
-            <span className="text-zinc-400 ">{createdAt.slice(5, 10)}</span>
+            <span className="text-zinc-400">@{username}</span>
+            <span className="text-zinc-400 text-xs">
+              *{createdAt ? timeAgoShort(createdAt) : "now"}
+            </span>
           </div>
-          <div className=" items-center h-full ">
-            <span className="h-full flex items-center">x</span>
+          <div className="items-center h-full">
+            <span className="h-full flex items-center">×</span>
           </div>
         </div>
+
         {/* text data */}
-        <div className="px-1 font-sans w-full h-auto ">{data}</div>
-        <div className="w-full h-6 mt-2   flex justify-around">
+        <div className="px-1 font-sans w-full h-auto">{data}</div>
+
+        <div className="w-full h-6 mt-2 flex justify-around">
           <span className="h-full flex items-center gap-1">
             <img src={commentpng} className="h-full" alt="" />
-            {comments.length}
+            {comments?.length || 0}
           </span>
           <span className="h-full flex items-center gap-1">
             <img src={love} className="h-full" alt="" />
-            {/* <img src={liked} className="h-full" alt="" /> */}
-            {likes.length}
+            {likes?.length || 0}
           </span>
           <span className="h-full flex items-center gap-1">
             <img src={share} className="h-full" alt="" />
           </span>
-          <span className="h-full flex items-center gap-1">
-            <img src={bin} className="h-full" alt="" />
-          </span>
+          {useIndex && (
+            <span
+              onClick={async () => {
+                const id = input._id;
+                try {
+                  console.log("responseclicekds");
+                  const response = await api.delete(`/api/deletepost/${id}`);
+                } catch (error) {}
+              }}
+              className="h-full flex items-center cursor-pointer gap-1"
+            >
+              <img src={bin} className="h-full" alt="" />
+            </span>
+          )}
         </div>
       </div>
     </div>
