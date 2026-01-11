@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+
+dotenv.config();
 import express from "express";
 import cookieparser from "cookie-parser";
 import cors from "cors";
@@ -5,13 +8,13 @@ import userModel from "./models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import postModel from "./models/postModel.js";
-
 const app = express();
 
 const corsOptions = {
-  origin: true,
+  origin: process.env.FRONTEND,
   credentials: true,
 };
+app.set("trust proxy", 1);
 
 app.use(cors(corsOptions));
 
@@ -40,7 +43,7 @@ const protectedroute = async (req, res, next) => {
       .json({ success: false, message: "No token provided" });
 
   try {
-    const data = jwt.verify(jwtToken, "shhhhhhhh");
+    const data = jwt.verify(jwtToken, process.env.JWT_SECRET);
     const user = await userModel
       .findOne({ email: data.data })
       .populate("posts"); // Populate posts here too
@@ -71,16 +74,16 @@ app.post("/api/login", async (req, res) => {
 
   const token = jwt.sign(
     { exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60, data: email },
-    "shhhhhhhh"
+    process.env.JWT_SECRET
   );
 
   res
     .status(201)
     .cookie("token", token, {
       httpOnly: true,
-      secure: false, // set true when on HTTPS
-      sameSite: "lax", // use "none" + secure:true if cross-site HTTPS
-      path: "/",
+      secure: true, // set true when on HTTPS
+      sameSite: "none", // use "none" + secure:true if cross-site HTTPS
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     })
     .json({ success: true });
 });
@@ -98,7 +101,7 @@ app.post("/api/signup", async (req, res) => {
 
   const token = jwt.sign(
     { exp: Math.floor(Date.now() / 1000) + 60 * 60, data: email },
-    "shhhhhhhh"
+    process.env.JWT_SECRET
   );
 
   res
