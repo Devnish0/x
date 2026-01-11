@@ -73,7 +73,6 @@ export const Post = ({ input = "error", isVerified, useIndex = true }) => {
               onClick={async () => {
                 const id = input._id;
                 try {
-                  console.log("responseclicekds");
                   const response = await api.delete(`/api/deletepost/${id}`);
                 } catch (error) {}
               }}
