@@ -1,17 +1,30 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate = useNavigate();
   return (
     <>
       <div className="w-full fixed bottom-0 bg-black flex items-center justify-around h-12">
-        <span>
-          <a href="/">home</a>
-        </span>
-        <span>search</span>
-        <span> notification</span>
-        <span>
+        <span
+          className="cursor-pointer"
+          onClick={() => {
+            navigate("/");
+          }}
+        >
           {" "}
-          <a href="/profile">profile</a>
+          home
+        </span>
+        <span className="cursor-pointer text-zinc-600">search</span>
+        <span className="cursor-pointer text-zinc-600"> notification</span>
+        <span
+          className="cursor-pointer"
+          onClick={() => {
+            navigate("/profile");
+          }}
+        >
+          {" "}
+          profile
         </span>
       </div>
     </>

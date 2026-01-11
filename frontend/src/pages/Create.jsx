@@ -2,10 +2,19 @@ import React from "react";
 import defaultpfp from "../assets/defaultpfp.png";
 import cross from "../assets/cross.png";
 import { useState } from "react";
+import api from "../services/axios";
 
-const Create = ({ oncross, onpost }) => {
+const Create = ({ oncross, name = "hey there", onpost }) => {
   const [text, setText] = useState("");
-  const submitHandler = () => {};
+  const [post, setPost] = useState(false);
+
+  const submitHandler = async () => {
+    try {
+      const response = await api.post("/api/create", { text: text });
+      oncross();
+    } catch (error) {}
+  };
+
   return (
     <div className="w-full h-screen bg-[#191919] px-4 fixed z-2 text-white pt-3">
       <div className="flex items-center  justify-between  h-12 ">
@@ -14,7 +23,7 @@ const Create = ({ oncross, onpost }) => {
         </button>
         <span>
           <button
-            disabled={!text.trim()}
+            disabled={!text.trim() || post}
             className={`
             px-6 py-1.25 font-semibold  bg-blue-400 rounded-full transition duration-150
             ${
@@ -23,9 +32,14 @@ const Create = ({ oncross, onpost }) => {
                 : "bg-blue-400 hover:bg-blue-500"
             }
                 `}
-            onClick={oncross}
+            onClick={() => {
+              setPost(true);
+
+              submitHandler();
+              onpost();
+            }}
           >
-            Post
+            {post ? "posting..." : "post"}
           </button>
         </span>
       </div>
@@ -35,7 +49,9 @@ const Create = ({ oncross, onpost }) => {
             <img src={defaultpfp} alt="" className="h-[90%] rounded-full " />
           </div>
         </div>
-        <div>hey</div>
+        <div className="border px-4 rounded-full text-blue-400 border-blue-400">
+          {name}
+        </div>
       </div>
       <div className="pl-15 pt-2 w-full ">
         <textarea

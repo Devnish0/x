@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./output.css";
 import AuthPage from "./pages/AuthPage";
 import { Routes, Route, Navigate } from "react-router-dom";

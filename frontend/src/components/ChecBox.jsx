@@ -35,6 +35,7 @@ export const ChecBox = ({ placeholder = "remember me" }) => {
         <span className="text-sm">
           {placeholder}
           <span className="underline text-blue-500">
+            {" "}
             {"terms and condition"}
           </span>
         </span>

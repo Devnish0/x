@@ -2,94 +2,57 @@ import React from "react";
 import defaultpng from "../assets/defaultpfp.png";
 import Footer from "../components/Footer";
 import { Post } from "../components/post";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-<Link to="/dashboard">
-  <button>Go</button>
-</Link>;
-
-const input = [
-  {
-    name: "nishank",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this for real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "nishank",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this for real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "woohoo",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this for real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "woohoo",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this for real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "woohoo",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this for real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "woohoo",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this are you sure about what you think about this life you migt think it can be real but trust me this is all fake for real             yes this i real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "woohoo",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this are you sure about what you think about this life you migt think it can be real but trust me this is all fake for real             yes this i real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-  {
-    name: "woohoo",
-    username: "nishank@006",
-    isverified: true,
-    time: "1h",
-    data: "hey lol is this are you sure about what you think about this life you migt think it can be real but trust me this is all fake for real             yes this i real",
-    likes: ["la;ksjfd;lksajdf;lkjsad", "ksajdf;lkj"],
-    comments: [{ id: 1, text: "nice post", userID: "jlksjafdlkj" }],
-  },
-];
+import api from "../services/axios";
+import { useEffect } from "react";
+import { useState } from "react";
+import Spinner from "../components/spinner";
+import correctpng from "../assets/correct.png";
 
 const Profile = () => {
+  const [userData, setUserdata] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get("/api/profile");
+        setUserdata(response.data.user);
+      } catch (error) {
+        setError(error.message || "error in fetching your profile");
+        console.error(error);
+        if (error?.response?.status === 401) {
+          navigate("/login");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, [navigate]);
+  const input = userData;
+  const { name, createdAt, username, followers, following } = userData;
+  if (loading) {
+    return (
+      <div className="bg-black flex justify-center items-center w-full h-screen">
+        <Spinner className="w-10 h-10" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center py-10">{error}</div>;
+  }
+
   return (
-    <div className="w-full h-full bg-[#191919]  z-2 text-white ">
+    <div className="w-full min-h-screen bg-[#191919] z-2 text-white flex flex-col">
+      {/* Header */}
       <div className="flex bg-pink-500 w-full h-32 relative items-center justify-center">
-        {" "}
         back
-        <div className=" w-19 h-19 ml-2 absolute left-0.5 -bottom-13 ">
+        <div className="w-19 h-19 ml-2 absolute left-0.5 -bottom-13">
           <img
             src={defaultpng}
             alt=""
@@ -97,42 +60,67 @@ const Profile = () => {
           />
         </div>
       </div>
+
+      {/* User Info */}
       <div className="px-4">
-        <div className="flex w-full justify-end mt-3 ">
-          <Link to="/signup">
-            <button className="px-4 py-1.25 rounded-full outline-zinc-500 outline text-zinc-500 bg-red-300 font-semibold">
-              logOut
-            </button>
-          </Link>
+        <div className="flex w-full justify-end mt-3">
+          <button
+            className="px-4 py-1.25 rounded-full outline-zinc-500 outline text-zinc-500 bg-red-300 font-semibold"
+            onClick={() => {
+              api.get("/api/logout");
+              navigate("/login");
+            }}
+          >
+            logOut
+          </button>
         </div>
-        <div className="pt-2  flex flex-col">
-          <span className="text-[17px] font-bold">nishank</span>
+        <div className="pt-2 flex flex-col">
+          <span className="h-10 gap-1 items-center flex">
+            <span className="font-semibold">{name}</span>
+            {input.isAdmin && (
+              <span className="h-full flex items-center">
+                <img src={correctpng} className="h-[40%]" alt="" />
+              </span>
+            )}
+          </span>
           <span className="text-[10px] text-zinc-400 font-bold">
-            @nishank__
+            @{username}
           </span>
           <span className="text-[14px] ">wanna be fullstack dev | CS29</span>
           <span className="text-[10px] flex gap-3 text-zinc-400 font-bold">
-            <span> Deutschland </span> <span> Born 30 December 2007</span>
+            <span>Deutschland</span> <span>Born 30 December 2007</span>
           </span>
           <span className="text-[10px] flex gap-3 text-zinc-400 font-bold">
-            joined March 2025
+            joined {userData.createdAt ? createdAt.slice(0, 10) : "N/A"}
           </span>
-          <span className="text-[14px]">
+          <span className="text-[14px] flex gap-2">
             <span>
-              <span className="font-semibold">487 </span>
-              <span className="text-zinc-400">Following </span>
+              <span className="font-semibold">{followers?.length || 0} </span>
+              <span className="text-zinc-400">Followers</span>
             </span>
             <span>
-              <span className="font-semibold">487 </span>
-              <span className="text-zinc-400">Following </span>
+              <span className="font-semibold">{following?.length || 0} </span>
+              <span className="text-zinc-400">Following</span>
             </span>
           </span>
         </div>
       </div>
-      <div className="border-t pb-17 border-zinc-600 mt-2 h-full">
-        {input.map((post, index) => (
-          <Post key={index} {...post} />
-        ))}
+
+      {/* Posts */}
+      <div className="flex-1 overflow-y-auto border-t border-zinc-600 mt-2">
+        {input?.posts && input.posts.length > 0 ? (
+          input.posts.map((post) => {
+            return (
+              <Post
+                key={post._id}
+                input={post}
+                isVerified={post?.user?.isAdmin === true} // Use === true for boolean check
+              />
+            );
+          })
+        ) : (
+          <div className="text-center py-10 text-zinc-500">No posts yet</div>
+        )}
       </div>
 
       <Footer />
