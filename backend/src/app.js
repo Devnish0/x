@@ -11,8 +11,8 @@ import postModel from "./models/postModel.js";
 const app = express();
 
 const corsOptions = {
-  // origin: process.env.FRONTEND,
-  origin: "http://localhost:5173",
+  origin: process.env.FRONTEND,
+  // origin: "http://localhost:5173",
 
   credentials: true,
 };
