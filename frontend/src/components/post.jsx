@@ -65,7 +65,12 @@ export const Post = ({ input = "error", isVerified, useIndex = true }) => {
             <img src={love} className="h-full" alt="" />
             {likes?.length || 0}
           </span>
-          <span className="h-full flex items-center gap-1">
+          <span
+            className="h-full flex items-center cursor-pointer gap-1"
+            onClick={navigator.clipboard.writeText(
+              "https://intiger.vercel.app"
+            )}
+          >
             <img src={share} className="h-full" alt="" />
           </span>
           {useIndex && (
