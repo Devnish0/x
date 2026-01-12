@@ -62,9 +62,6 @@ export const Index = () => {
               oncross={() => {
                 setShow(false);
               }}
-              onpost={() => {
-                setRefresh((r) => r + 1);
-              }}
             />
           )}
           <div className="w-full border-b flex items-center justify-around text-zinc-500  border-zinc-300 pb-2">

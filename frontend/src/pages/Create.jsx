@@ -4,7 +4,7 @@ import cross from "../assets/cross.png";
 import { useState } from "react";
 import api from "../services/axios";
 
-const Create = ({ oncross, name = "hey there", onpost }) => {
+const Create = ({ oncross, name = "hey there" }) => {
   const [text, setText] = useState("");
   const [post, setPost] = useState(false);
 
