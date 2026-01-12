@@ -21,14 +21,14 @@ app.set("trust proxy", 1);
 app.use(cors(corsOptions));
 
 // Logging middleware
-app.use((req, res, next) => {
-  console.log(
-    `[${new Date().toLocaleTimeString()}] ${req.method} ${req.path} ${
-      req.headers.origin
-    } `
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(
+//     `[${new Date().toLocaleTimeString()}] ${req.method} ${req.path} ${
+//       req.headers.origin
+//     } `
+//   );
+//   next();
+// });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -126,6 +126,7 @@ app.get("/api/logout", protectedroute, (req, res) => {
   });
   res.status(201).json({ success: true });
 });
+
 app.get("/api/profile", protectedroute, async (req, res) => {
   try {
     // Populate posts when fetching user profile
