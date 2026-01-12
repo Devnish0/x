@@ -110,7 +110,7 @@ app.post("/api/signup", async (req, res) => {
     .status(201)
     .cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       sameSite: "none",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -119,7 +119,12 @@ app.post("/api/signup", async (req, res) => {
 });
 // logout route
 app.get("/api/logout", protectedroute, (req, res) => {
-  res.status(201).cookie("token", "lol").json({ success: true });
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
+  res.status(201).json({ success: true });
 });
 app.get("/api/profile", protectedroute, async (req, res) => {
   try {
