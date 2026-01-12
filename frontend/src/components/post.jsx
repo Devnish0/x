@@ -67,9 +67,9 @@ export const Post = ({ input = "error", isVerified, useIndex = true }) => {
           </span>
           <span
             className="h-full flex items-center cursor-pointer gap-1"
-            onClick={navigator.clipboard.writeText(
-              "https://intiger.vercel.app"
-            )}
+            onClick={() => {
+              navigator.clipboard.writeText("https://intiger.vercel.app");
+            }}
           >
             <img src={share} className="h-full" alt="" />
           </span>
