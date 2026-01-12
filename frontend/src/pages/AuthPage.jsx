@@ -110,7 +110,7 @@ const AuthPage = ({ mode }) => {
                   bg-[#6D54B3]  hover:bg-[#5b409d] cursor-pointer
                   px-3 py-3 rounded-md flex items-center justify-center gap-3 border-0 outline-none focus:outline focus:ring-0 focus:border-0 outline-[#b3acc7] ring-0 focus-visible:outline `}
                 type="submit"
-                disabled={loading}
+                // disabled={loading}
               >
                 submit
                 {loading ? <Spinner /> : ""}
