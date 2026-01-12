@@ -11,7 +11,9 @@ import postModel from "./models/postModel.js";
 const app = express();
 
 const corsOptions = {
-  origin: process.env.FRONTEND,
+  // origin: process.env.FRONTEND,
+  origin: "http://localhost:5173",
+
   credentials: true,
 };
 app.set("trust proxy", 1);
@@ -109,7 +111,7 @@ app.post("/api/signup", async (req, res) => {
     .cookie("token", token, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })

@@ -73,6 +73,7 @@ export const Index = () => {
             <span> Build in public</span>
           </div>
           <div className="h-full w-full">
+            {console.log(input)}
             {input.length === 0 ? (
               <div className="flex h-full items-center justify-center">
                 no posts yet
