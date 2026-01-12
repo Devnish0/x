@@ -62,10 +62,6 @@ const protectedroute = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "Invalid token" });
   }
 };
-app.get("/api/test", (req, res) => {
-  console.log("test done");
-  res.json({ lol: "for real?" });
-});
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await userModel.findOne({ email });
@@ -110,12 +106,11 @@ app.post("/api/signup", async (req, res) => {
     .status(201)
     .cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
+      secure: true, // set true when on HTTPS
+      sameSite: "none", // use "none" + secure:true if cross-site HTTPS
       maxAge: 7 * 24 * 60 * 60 * 1000,
     })
-    .json({ success: true, user: { id: user._id, email: user.email } });
+    .json({ success: true });
 });
 // logout route
 app.get("/api/logout", protectedroute, (req, res) => {
