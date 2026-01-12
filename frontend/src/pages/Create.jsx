@@ -36,7 +36,6 @@ const Create = ({ oncross, name = "hey there" }) => {
               setPost(true);
 
               submitHandler();
-              onpost();
             }}
           >
             {post ? "posting..." : "post"}
