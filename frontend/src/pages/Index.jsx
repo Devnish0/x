@@ -24,7 +24,7 @@ export const Index = () => {
         setInput(posts);
       } catch (error) {
         setError(error);
-        navigate("/login");
+        navigate("/signup");
       } finally {
         setLoading(false);
       }
