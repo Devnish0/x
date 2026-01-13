@@ -20,7 +20,7 @@ let origin =
     : "http://localhost:5173";
 
 const corsOptions = {
-  // origin: origin,
+  origin: origin,
 
   credentials: true,
 };
