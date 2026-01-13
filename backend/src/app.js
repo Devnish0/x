@@ -10,10 +10,6 @@ import jwt from "jsonwebtoken";
 import postModel from "./models/postModel.js";
 const app = express();
 
-app.use((req, res, next) => {
-  console.log(req.method);
-  next();
-});
 let origin =
   process.env.NODE_ENV === "production"
     ? process.env.FRONTEND
