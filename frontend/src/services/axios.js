@@ -1,9 +1,11 @@
 import axios from "axios";
+let baseURL =
+  import.meta.env.NODE_ENV === "production"
+    ? "https://sea-turtle-app-r54qb.ondigitalocean.app/"
+    : "/";
 
 const api = axios.create({
-  baseURL: "https://sea-turtle-app-r54qb.ondigitalocean.app/",
-  // baseURL: "http:/localhost:5000",
-
+  baseURL: baseURL,
   withCredentials: true,
 });
 export default api;

@@ -4,7 +4,10 @@ import mongoose from "mongoose";
 import app from "./app.js";
 
 const PORT = process.env.PORT || 5000;
-const DBURL = process.env.DBURL;
+const DBURL =
+  process.env.NODE_ENV === "production"
+    ? process.env.DBURL
+    : "mongodb://127.0.0.1:27017/intiger";
 
 // Validate environment variables
 if (!DBURL) {
@@ -19,7 +22,7 @@ mongoose
     console.log("✅ Database connected successfully");
     app.listen(PORT, () => {
       console.log(`🚀 Server is running at http://localhost:${PORT}`);
-      console.log(`📝 Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`📝 Environment: ${process.env.NODE_ENV}`);
     });
   })
   .catch((err) => {
