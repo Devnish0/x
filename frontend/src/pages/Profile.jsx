@@ -3,7 +3,6 @@ import defaultpng from "../assets/defaultpfp.png";
 import Footer from "../components/Footer";
 import { Post } from "../components/post";
 import { useNavigate } from "react-router-dom";
-
 import api from "../services/axios";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -15,6 +14,9 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const deleteHandeler = (postid) => {
+    console.log(postid);
+  };
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -33,6 +35,7 @@ const Profile = () => {
     };
     fetchUserData();
   }, [navigate]);
+
   const input = userData;
   const { name, createdAt, username, followers, following } = userData;
   if (loading) {
@@ -108,10 +111,11 @@ const Profile = () => {
 
       {/* Posts */}
       <div className="flex-1 overflow-y-auto border-t border-zinc-600 mt-2">
-        {input?.posts && input.posts.length > 0 ? (
-          input.posts.map((post) => {
+        {userData?.posts && userData.posts.length > 0 ? (
+          userData.posts.map((post) => {
             return (
               <Post
+                onDelete={deleteHandeler}
                 key={post._id}
                 input={post}
                 isVerified={post?.user?.isAdmin === true} // Use === true for boolean check

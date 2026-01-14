@@ -94,6 +94,7 @@ app.post("/api/signup", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashed = await bcrypt.hash(password, salt);
 
+  console.log(name, username, email, password);
   const user = await userModel.create({
     name,
     username,
@@ -187,6 +188,7 @@ app.get("/api/index", protectedroute, async (req, res) => {
 app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
   try {
     const { id } = req.params; // Extract id from params object
+    console.log("route hit");
 
     // Check if post exists and user owns it
     const post = await postModel.findById(id);

@@ -4,13 +4,22 @@ import commentpng from "../assets/comment.png";
 import love from "../assets/love.png";
 import share from "../assets/share.png";
 import bin from "../assets/bin.png";
-import liked from "../assets/liked.png";
+import loved from "../assets/liked.png";
 import correctpng from "../assets/correct.png";
 import api from "../services/axios";
+import { useState } from "react";
 
-export const Post = ({ input = "error", isVerified, useIndex = true }) => {
+export const Post = ({
+  input = "error",
+  isVerified,
+  useIndex = true,
+  onDelete,
+}) => {
+  const { comments = [], createdAt, likes = [], data, _id } = input;
+  const [islike, setisLike] = useState(false);
+
   const { name, username } = input?.user;
-  const { comments = [], createdAt, likes = [], data } = input;
+  const [likeCount, setlikeCount] = useState(likes.length ?? 0);
 
   const timeAgoShort = (date) => {
     const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -61,9 +70,19 @@ export const Post = ({ input = "error", isVerified, useIndex = true }) => {
             <img src={commentpng} className="h-full" alt="" />
             {comments?.length || 0}
           </span>
-          <span className="h-full flex items-center gap-1">
-            <img src={love} className="h-full" alt="" />
-            {likes?.length || 0}
+          <span
+            className="h-full flex items-center gap-1"
+            onClick={() => {
+              setisLike(!islike);
+              if (!islike) {
+                setlikeCount(1);
+              } else {
+                setlikeCount(0);
+              }
+            }}
+          >
+            <img src={!islike ? love : loved} className="h-full" alt="" />
+            {likeCount}
           </span>
           <span
             className="h-full flex items-center cursor-pointer gap-1"
@@ -75,11 +94,8 @@ export const Post = ({ input = "error", isVerified, useIndex = true }) => {
           </span>
           {useIndex && (
             <span
-              onClick={async () => {
-                const id = input._id;
-                try {
-                  const response = await api.delete(`/api/deletepost/${id}`);
-                } catch (error) {}
+              onClick={() => {
+                onDelete(_id);
               }}
               className="h-full flex items-center cursor-pointer gap-1"
             >
