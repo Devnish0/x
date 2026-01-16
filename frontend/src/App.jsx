@@ -5,6 +5,7 @@ import { Index } from "./pages/Index";
 import Create from "./pages/Create";
 import Profile from "./pages/Profile";
 import Editpage from "./pages/editpage";
+import Postpage from "./pages/Postpage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/login" element={<AuthPage mode="login" />} />
       <Route path="/signup" element={<AuthPage mode="signup" />} />
       <Route path="/edit" element={<Editpage />} />
+      <Route path="/post/:id" element={<Postpage />} />
     </Routes>
   );
 }

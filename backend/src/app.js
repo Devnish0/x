@@ -160,6 +160,14 @@ app.get("/api/profile", protectedroute, async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+app.get("/api/post/:id", protectedroute, async (req, res) => {
+  const { id } = req.params;
+  const post = await postModel
+    .findOne({ _id: id })
+    .populate("user", "username name isAdmin");
+  console.log(post);
+  res.status(201).json(post);
+});
 app.post("/api/post", protectedroute, async (req, res) => {});
 
 // Fix pushing post ID

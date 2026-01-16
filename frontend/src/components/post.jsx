@@ -8,6 +8,7 @@ import loved from "../assets/liked.png";
 import correctpng from "../assets/correct.png";
 import api from "../services/axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Post = ({
   input = "error",
@@ -15,6 +16,7 @@ export const Post = ({
   useIndex = true,
   onDelete,
 }) => {
+  const navigate = useNavigate();
   const { comments = [], createdAt, likes = [], data, _id } = input;
   const [islike, setisLike] = useState(false);
 
@@ -35,7 +37,12 @@ export const Post = ({
   };
 
   return (
-    <div className="flex h-auto w-full px-3 bg-[#191919] py-2 border-b border-zinc-600">
+    <div
+      className="flex h-auto w-full px-3 bg-[#191919] py-2 border-b border-zinc-600 "
+      onClick={() => {
+        navigate(`/post/${_id}`);
+      }}
+    >
       <div className="h-full w-12">
         <div className="flex justify-center items-center">
           <img src={defaultpfp} alt="" className="rounded-full" />

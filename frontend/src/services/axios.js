@@ -1,5 +1,5 @@
 import axios from "axios";
-const MODE = "production";
+const MODE = "development";
 let baseURL =
   MODE === "production"
     ? "https://sea-turtle-app-r54qb.ondigitalocean.app/"
