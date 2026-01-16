@@ -40,7 +40,6 @@ const userSchema = new mongoose.Schema(
       default: "bio not given",
     },
     location: String,
-    DateOfBirth: Date,
     isAdmin: { type: Boolean, default: false },
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "post" }], // fix ref
   },
