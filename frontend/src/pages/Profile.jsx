@@ -4,8 +4,7 @@ import Footer from "../components/Footer";
 import { Post } from "../components/post";
 import { useNavigate } from "react-router-dom";
 import api from "../services/axios";
-import { useEffect } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Spinner from "../components/spinner";
 import correctpng from "../assets/correct.png";
 
@@ -37,7 +36,8 @@ const Profile = () => {
   }, [navigate]);
 
   const input = userData;
-  const { name, createdAt, username, followers, following } = userData;
+  const { name, createdAt, username, followers, following, bio, location } =
+    userData;
   if (loading) {
     return (
       <div className="bg-black flex justify-center items-center w-full h-screen">
@@ -70,11 +70,10 @@ const Profile = () => {
           <button
             className="px-4 py-1.25 rounded-full outline-zinc-500 outline text-zinc-500 bg-red-300 font-semibold"
             onClick={() => {
-              api.get("/api/logout");
-              navigate("/login");
+              navigate("/edit");
             }}
           >
-            logOut
+            Edit Profile
           </button>
         </div>
         <div className="pt-2 flex flex-col">
@@ -89,9 +88,9 @@ const Profile = () => {
           <span className="text-[10px] text-zinc-400 font-bold">
             @{username}
           </span>
-          <span className="text-[14px] ">wanna be fullstack dev | CS29</span>
+          <span className="text-[14px] ">{bio}</span>
           <span className="text-[10px] flex gap-3 text-zinc-400 font-bold">
-            <span>Deutschland</span> <span>Born 30 December 2007</span>
+            <span>{location}</span>
           </span>
           <span className="text-[10px] flex gap-3 text-zinc-400 font-bold">
             joined {userData.createdAt ? createdAt.slice(0, 10) : "N/A"}

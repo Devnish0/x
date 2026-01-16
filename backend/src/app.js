@@ -24,22 +24,11 @@ app.set("trust proxy", 1);
 
 app.use(cors(corsOptions));
 
-// Logging middleware
-// app.use((req, res, next) => {
-//   console.log(
-//     `[${new Date().toLocaleTimeString()}] ${req.method} ${req.path} ${
-//       req.headers.origin
-//     } `
-//   );
-//   next();
-// });
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser());
 
 // auth routes
-//
 
 const protectedroute = async (req, res, next) => {
   const jwtToken = req.cookies.token;
@@ -90,16 +79,17 @@ app.post("/api/login", async (req, res) => {
     .json({ success: true });
 });
 app.post("/api/signup", async (req, res) => {
-  const { name, username, email, password } = req.body;
+  const { name, username, email, password, bio, location } = req.body;
   const salt = await bcrypt.genSalt(10);
   const hashed = await bcrypt.hash(password, salt);
 
-  console.log(name, username, email, password);
   const user = await userModel.create({
     name,
     username,
     email,
     password: hashed,
+    bio,
+    location,
   });
 
   const token = jwt.sign(
@@ -135,23 +125,38 @@ app.get("/api/profile", protectedroute, async (req, res) => {
       options: { sort: { createdAt: -1 } },
       populate: { path: "user", select: "name username isAdmin" },
     });
-
+    const {
+      _id,
+      name,
+      username,
+      email,
+      createdAt,
+      followers,
+      following,
+      posts,
+      isAdmin,
+      bio,
+      location,
+    } = user;
     res.json({
       success: true,
       user: {
-        id: user._id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        createdAt: user.createdAt,
-        followers: user.followers,
-        following: user.following,
-        posts: user.posts,
-        isAdmin: user.isAdmin,
+        id: _id,
+        name,
+        username,
+        email,
+        createdAt,
+        followers,
+        following,
+        posts,
+        isAdmin,
+        bio,
+        location,
       },
     });
   } catch (error) {
     console.log(error);
+
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -183,6 +188,31 @@ app.get("/api/index", protectedroute, async (req, res) => {
     res.status(200).json({ success: true, posts }); // Fixed typo: sucess → success
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
+  }
+});
+app.get("/api/edit", protectedroute, (req, res) => {
+  const { name, username, bio, location } = req.user;
+  return res.status(200).json({ name, username, bio, location });
+});
+app.post("/api/edit", protectedroute, async (req, res) => {
+  try {
+    const { name, username, bio, location } = req.body;
+    const id = req.user._id;
+    const editedUser = await userModel
+      .findOneAndUpdate(
+        id,
+        {
+          $set: { name, username, bio, location },
+        },
+        { new: true, runValidators: true }
+      )
+      .select("name username bio location");
+
+    return res.status(201).json({ success: "ok" });
+
+    // return res.status(200).json({ name, username, bio, location });
+  } catch (error) {
+    console.log(error);
   }
 });
 app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
