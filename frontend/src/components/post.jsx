@@ -38,7 +38,7 @@ export const Post = ({
 
   return (
     <div
-      className="flex h-auto w-full px-3 bg-[#191919] py-2 border-b border-zinc-600 "
+      className="flex h-auto w-full px-3 bg-[#191919] cursor-pointer py-2 border-b border-zinc-600 "
       onClick={() => {
         navigate(`/post/${_id}`);
       }}

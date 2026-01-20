@@ -26,7 +26,7 @@ const Postpage = () => {
         setLoading(false);
       }
     };
-    // fetchpost();
+    fetchpost();
   }, [navigate]);
 
   if (loading) {
@@ -49,19 +49,40 @@ const Postpage = () => {
       </div>
       <div className="h-17"></div>
       <div className="">
-        {/* <Post
+        {console.log(post)}
+        <Post
           input={post}
           isVerified={post?.user?.isAdmin === true}
           useIndex={false}
-        /> */}
+        />
       </div>
-      {7 <= 0 ? (
+      {2 > 0 ? (
         <div className="w-full h-130 flex items-center justify-center text-3xl text-zinc-600">
           no comments yet
         </div>
       ) : (
-        <div className="w-full h-130 flex items-center justify-center text-3xl text-zinc-600">
-          lol comments
+        <div className="w-full h-130 flex  text-3xl text-white">
+          <Post
+            input={{
+              _id: new ObjectId("696f2c7c2b026599f09f8ccc"),
+              user: {
+                _id: new ObjectId("696f2c722b026599f09f8cc5"),
+                name: "nishank",
+                username: "nishank@nishank.com",
+                isAdmin: false,
+              },
+              data: "yoo lol",
+              likes: [],
+              comments: [],
+              createdAt: "2026-01-20T07:19:24.276Z",
+              updatedAt: "2026-01-20T07:19:24.276Z",
+              __v: 0,
+            }}
+            isVerified={false}
+            onDelete={() => {
+              console.log("lol");
+            }}
+          />
         </div>
       )}
       <div className=" w-full justify-center fixed bottom-0 flex items-center">

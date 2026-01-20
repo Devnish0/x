@@ -13,7 +13,7 @@ const postSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("post", postSchema);
