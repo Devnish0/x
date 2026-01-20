@@ -12,7 +12,11 @@ const app = express();
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? ["https://intiger.vercel.app", "https://intiger.nishank.dev"]
+    ? [
+        "https://intiger.vercel.app",
+        "https://intiger.nishank.dev",
+        "https://nishank.dev",
+      ]
     : ["http://localhost:5173"];
 
 const corsOptions = {
