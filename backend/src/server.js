@@ -9,8 +9,6 @@ const DBURL =
     ? process.env.DBURL
     : "mongodb://127.0.0.1:27017/intiger";
 
-console.log(DBURL);
-
 // Validate environment variables
 if (!DBURL) {
   console.error("❌ Error: DBURL is not defined in .env file");
