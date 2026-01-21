@@ -1,14 +1,13 @@
-import React from "react";
-import { useParams } from "react-router-dom";
+import { data, useParams } from "react-router-dom";
 import api from "../services/axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Post from "../components/post";
 import Spinner from "../components/spinner";
+import Mainpost from "../components/Mainpost";
 
 const Postpage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [post, setPost] = useState({});
   const { id } = useParams();
   useEffect(() => {
@@ -16,8 +15,6 @@ const Postpage = () => {
       try {
         setLoading(true);
         const response = await api.get(`/api/post/${id}`);
-        console.log(response);
-        // const post = response.data;
         setPost(response.data);
         console.log(response.data);
       } catch (error) {
@@ -49,41 +46,23 @@ const Postpage = () => {
       </div>
       <div className="h-17"></div>
       <div className="">
-        {console.log(post)}
-        <Post
+        {/* <Post
+          input={post}
+          isVerified={post?.user?.isAdmin === true}
+          useIndex={false}
+        /> */}
+        <Mainpost
           input={post}
           isVerified={post?.user?.isAdmin === true}
           useIndex={false}
         />
       </div>
-      {2 > 0 ? (
+      {post.comments.length <= 0 ? (
         <div className="w-full h-130 flex items-center justify-center text-3xl text-zinc-600">
           no comments yet
         </div>
       ) : (
-        <div className="w-full h-130 flex  text-3xl text-white">
-          <Post
-            input={{
-              _id: new ObjectId("696f2c7c2b026599f09f8ccc"),
-              user: {
-                _id: new ObjectId("696f2c722b026599f09f8cc5"),
-                name: "nishank",
-                username: "nishank@nishank.com",
-                isAdmin: false,
-              },
-              data: "yoo lol",
-              likes: [],
-              comments: [],
-              createdAt: "2026-01-20T07:19:24.276Z",
-              updatedAt: "2026-01-20T07:19:24.276Z",
-              __v: 0,
-            }}
-            isVerified={false}
-            onDelete={() => {
-              console.log("lol");
-            }}
-          />
-        </div>
+        <div className="w-full h-130 flex  text-3xl text-white"></div>
       )}
       <div className=" w-full justify-center fixed bottom-0 flex items-center">
         <form action="" method="get">
