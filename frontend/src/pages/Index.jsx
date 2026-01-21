@@ -46,7 +46,7 @@ export const Index = () => {
     );
   }
   return (
-    <div className="h-screen w-full bg-black/90 flex flex-col text-white  ">
+    <div className="m-h-screen w-full bg-black/90 flex flex-col pt-14 pb-15 text-white  ">
       {show ? (
         <Create
           oncross={() => {
@@ -55,7 +55,6 @@ export const Index = () => {
         />
       ) : (
         <>
-          <div className="h-20"></div>
           <Header className="fixed bg-[#191919]  w-full top-0 " />
           {show && (
             <Create
