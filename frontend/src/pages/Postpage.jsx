@@ -34,23 +34,18 @@ const Postpage = () => {
     );
   }
   return (
-    <div className="min-h-full h-screen text-white bg-[#191919]">
+    <div className="min-h-full h-m-screen text-white bg-[#191919]">
       <div
-        className=" fixed top-0 text-white gap-6 outline-b outline h-17 flex items-center px-3 w-full"
+        className=" fixed top-0 text-white gap-6 outline-b outline h-10 flex items-center px-3 bg-[#191919] w-full"
         onClick={() => {
           navigate("/");
         }}
       >
         <span>backs</span>
-        <span className="text-xl">Post</span>
+        <span className="">Post</span>
       </div>
-      <div className="h-17"></div>
-      <div className="">
-        {/* <Post
-          input={post}
-          isVerified={post?.user?.isAdmin === true}
-          useIndex={false}
-        /> */}
+      <div className="h-10"></div>
+      <div className="pt-6">
         <Mainpost
           input={post}
           isVerified={post?.user?.isAdmin === true}

@@ -174,7 +174,6 @@ app.get("/api/post/:id", protectedroute, async (req, res) => {
   const post = await postModel
     .findOne({ _id: id })
     .populate("user", "username name isAdmin");
-  console.log(post);
   res.status(201).json(post);
 });
 app.post("/api/post", protectedroute, async (req, res) => {});
