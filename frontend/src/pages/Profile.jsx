@@ -51,7 +51,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#191919] z-2 text-white flex flex-col">
+    <div className="w-full min-h-screen bg-[#191919] pb-15 z-2 text-white flex flex-col">
       {/* Header */}
       <div className="flex bg-pink-500 w-full h-32 relative items-center justify-center">
         back

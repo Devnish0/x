@@ -10,14 +10,23 @@ import jwt from "jsonwebtoken";
 import postModel from "./models/postModel.js";
 const app = express();
 
-let origin =
+const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? process.env.FRONTEND
-    : "http://localhost:5173";
+    ? [
+        "https://intiger.vercel.app",
+        "https://intiger.nishank.dev",
+        "https://nishank.dev",
+      ]
+    : ["http://localhost:5173"];
 
 const corsOptions = {
-  origin: origin,
-
+  origin: function (requestOrigin, callback) {
+    if (!requestOrigin || allowedOrigins.includes(requestOrigin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 };
 app.set("trust proxy", 1);
@@ -65,7 +74,7 @@ app.post("/api/login", async (req, res) => {
 
   const token = jwt.sign(
     { exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60, data: email },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
   );
 
   res
@@ -94,7 +103,7 @@ app.post("/api/signup", async (req, res) => {
 
   const token = jwt.sign(
     { exp: Math.floor(Date.now() / 1000) + 60 * 60, data: email },
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
   );
 
   res
@@ -179,7 +188,7 @@ app.post("/api/create", protectedroute, async (req, res) => {
     await userModel.findByIdAndUpdate(
       userId,
       { $push: { posts: post._id } },
-      { new: true }
+      { new: true },
     );
     res.status(201).json({ success: true, post });
   } catch (error) {
@@ -212,7 +221,7 @@ app.post("/api/edit", protectedroute, async (req, res) => {
         {
           $set: { name, username, bio, location },
         },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
       )
       .select("name username bio location");
 
@@ -248,7 +257,7 @@ app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
     await userModel.findByIdAndUpdate(
       req.user._id,
       { $pull: { posts: id } },
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json({ success: true, message: "Post deleted" });
