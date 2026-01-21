@@ -54,10 +54,7 @@ const Mainpost = ({
           <span className="text-zinc-400 text-[14px]">@{username}</span>
         </div>
       </div>
-      <div className="w-full h-full tracking-wide ">
-        {data} hey there what is the main aim of yuou life if you want you cann
-        taell me
-      </div>
+      <div className="w-full h-full tracking-wide ">{data}</div>
       <div className="w-ful h-5  mt-3 text-[10px] text-zinc-400">
         {formattedTime(createdAt)}
       </div>
