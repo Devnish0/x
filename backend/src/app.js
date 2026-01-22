@@ -64,6 +64,10 @@ const protectedroute = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "Invalid token" });
   }
 };
+app.post("/api/comment", protectedroute, (req, res) => {
+  console.log("lol");
+  res.status(201).json({ success: true });
+});
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await userModel.findOne({ email });
