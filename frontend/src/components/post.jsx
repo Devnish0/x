@@ -54,7 +54,7 @@ export const Post = ({
             <span className="h-full gap-1 items-center flex">
               <span className="font-semibold">{name}</span>
               {isVerified && (
-                <span className="h-full flex items-center">
+                <span className="flex h-5 w-5 items-center">
                   <img src={correctpng} className="h-5 w-5" alt="verified" />
                 </span>
               )}
