@@ -53,7 +53,7 @@ const Postpage = () => {
         />
       </div>
       {post.comments.length <= 0 ? (
-        <div className="w-full h-130 flex items-center justify-center text-3xl text-zinc-600">
+        <div className="w-full min-h-screen flex items-center justify-center text-3xl text-zinc-600">
           no comments yet
         </div>
       ) : (
