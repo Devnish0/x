@@ -86,7 +86,6 @@ export const Index = () => {
               })
             )}
           </div>
-          {/* plus icon */}
           <button
             className="p-7 bg-blue-400  rounded-full w-8 h-8 flex justify-center items-center text-3xl bottom-15 right-2 fixed "
             onClick={() => {

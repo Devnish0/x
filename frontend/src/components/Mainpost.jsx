@@ -99,16 +99,18 @@ const Mainpost = ({
         </span>
       </div>
       <div className="w-full border-t-zinc-600  mt-3">
-        <form action="" method="post" className="flex">
-          <span className="w-9 h-9 ">
-            <img
-              src={defaultpfp}
-              alt=""
-              srcset=""
-              className="w-full h-full rounded-full"
-            />
-          </span>
-          <span>
+        <form
+          action={`api/comment/${_id}`}
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          method="post"
+          className="flex"
+        >
+          <div className="w-12">
+            <img src={defaultpfp} alt="" srcset="" className="rounded-full" />
+          </div>
+          <span className="w-full">
             <input
               type="text"
               name=""
@@ -121,9 +123,10 @@ const Mainpost = ({
             />
           </span>
           <button
+            type="submit"
             disabled={!text.trim()}
             className={`
-            px-4 py-1 font-semibold  bg-blue-400 rounded-full transition duration-150
+            px-4 py-1 flex items-center justify-center font-semibold bg-blue-400 rounded-full transition duration-150
             ${
               !text
                 ? "bg-zinc-600 cursor-not-allowed"
