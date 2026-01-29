@@ -15,6 +15,8 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/login" element={<AuthPage mode="login" />} />
       <Route path="/signup" element={<AuthPage mode="signup" />} />
+      <Route path="/otpverify" element={<AuthPage mode="otp" />} />
+
       <Route path="/edit" element={<Editpage />} />
       <Route path="/post/:id" element={<Postpage />} />
     </Routes>

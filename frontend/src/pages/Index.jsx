@@ -70,7 +70,7 @@ export const Index = () => {
           </div>
           <div className="h-full w-full">
             {input.length === 0 ? (
-              <div className="flex h-full items-center justify-center">
+              <div className="flex min-h-screen items-center justify-center">
                 no posts yet
               </div>
             ) : (

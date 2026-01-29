@@ -5,6 +5,9 @@ import express from "express";
 import cookieparser from "cookie-parser";
 import cors from "cors";
 import userModel from "./models/userModel.js";
+import { otpModel } from "./models/otpModel.js";
+import { Resend } from "resend";
+const resend = new Resend("re_fTUveJRp_MMAQcA8qd7FYhKZEqphZj42c");
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import postModel from "./models/postModel.js";
@@ -91,16 +94,88 @@ app.post("/api/login", async (req, res) => {
     })
     .json({ success: true });
 });
+const generateOTP = () => {
+  return Math.floor(Math.random() * 9000).toString();
+};
 app.post("/api/signup", async (req, res) => {
   const { name, username, email, password, bio, location } = req.body;
-  const salt = await bcrypt.genSalt(10);
-  const hashed = await bcrypt.hash(password, salt);
+  console.log();
 
-  const user = await userModel.create({
+  const alreadycreated = await userModel.findOne({ email });
+  if (alreadycreated) {
+    return res
+      .status(401)
+      .json({ message: "Email already available please log in" });
+  }
+
+  // const hashed = await bcrypt.hash(password, salt);
+
+  // const user = await userModel.create({
+  //   name,
+  //   username,
+  //   email,
+  //   password: hashed,
+  //   bio,
+  //   location,
+  // });
+  const salt = await bcrypt.genSalt(10);
+  const hashedPasswd = await bcrypt.hash(password, salt);
+  try {
+    const otp = generateOTP();
+    const data = await resend.emails.send({
+      from: "onboard@resend.dev",
+      to: email,
+      subject: "Your OTP Code",
+      text: `Here is your OTP code: ${otp}`,
+    });
+    const salt = await bcrypt.genSalt(10);
+    const hashedOTP = await bcrypt.hash(otp, salt);
+
+    const otpdata = await otpModel.create({
+      email,
+      otpHash: hashedOTP,
+      otpExpires: Date.now() + 300000,
+      otpAttempts: 0,
+      signupData: {
+        name,
+        username,
+        email,
+        password: hashedPasswd,
+        bio,
+        location,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+  res.status(201).json({ message: "okay" });
+});
+app.post("/api/verify", async (req, res) => {
+  const { otp } = req.body;
+
+  const record = await otpModel.findOne({}).sort({ _id: -1 }).limit(1);
+  // console.log("record:", record);
+  if (!record) {
+    return res.status(400).json({ message: "invalid OTP" });
+  }
+  if (record.otpExpires < Date.now()) {
+    return res.status(400).json({ message: "otp expired" });
+  }
+  if (record.otpAttemptes >= 3) {
+    return res.status(400).json({ message: "enough otp for today" });
+  }
+  const isValid = await bcrypt.compare(otp, record.otpHash);
+  if (!isValid) {
+    record.otpAttempts += 1;
+    await record.save();
+    return res.status(400).json({ message: "invalid OTP" });
+  }
+  const { name, username, email, password, bio, location } = record.signupData;
+  const createdUser = userModel.create({
     name,
     username,
     email,
-    password: hashed,
+    password,
     bio,
     location,
   });
@@ -205,7 +280,7 @@ app.get("/api/index", protectedroute, async (req, res) => {
       .find()
       .populate("user", "username name isAdmin")
       .sort({ createdAt: -1 });
-    res.status(200).json({ success: true, posts }); // Fixed typo: sucess → success
+    res.status(200).json({ success: true, posts });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -238,7 +313,6 @@ app.post("/api/edit", protectedroute, async (req, res) => {
 app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
   try {
     const { id } = req.params; // Extract id from params object
-    console.log("route hit");
 
     // Check if post exists and user owns it
     const post = await postModel.findById(id);
@@ -269,4 +343,5 @@ app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+
 export default app;
