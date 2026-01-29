@@ -7,7 +7,7 @@ import cors from "cors";
 import userModel from "./models/userModel.js";
 import { otpModel } from "./models/otpModel.js";
 import { Resend } from "resend";
-const resend = new Resend("re_fTUveJRp_MMAQcA8qd7FYhKZEqphZj42c");
+const resend = new Resend(process.env.RESEND_API);
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import postModel from "./models/postModel.js";
@@ -123,7 +123,7 @@ app.post("/api/signup", async (req, res) => {
   try {
     const otp = generateOTP();
     const data = await resend.emails.send({
-      from: "onboard@resend.dev",
+      from: "no-reply@nishank.dev",
       to: email,
       subject: "Your OTP Code",
       text: `Here is your OTP code: ${otp}`,
