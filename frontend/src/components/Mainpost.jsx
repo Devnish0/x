@@ -99,16 +99,21 @@ const Mainpost = ({
         </span>
       </div>
       <div className="w-full border-t-zinc-600  mt-3">
-        <form action="" method="post" className="flex">
-          <span className="w-9 h-9 ">
-            <img
-              src={defaultpfp}
-              alt=""
-              srcset=""
-              className="w-full h-full rounded-full"
-            />
-          </span>
-          <span>
+        <form
+          action=""
+          method="post"
+          className="flex w-full"
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <img
+            src={defaultpfp}
+            alt=""
+            srcset=""
+            className="w-9 h-9 rounded-full"
+          />
+          <span className="w-full">
             <input
               type="text"
               name=""
