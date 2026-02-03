@@ -11,7 +11,12 @@ const resend = new Resend(process.env.RESEND_API);
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import postModel from "./models/postModel.js";
+import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
+
 const app = express();
+import path from "path";
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
@@ -95,7 +100,6 @@ const generateOTP = () => {
 };
 app.post("/api/signup", async (req, res) => {
   const { name, username, email, password, bio, location } = req.body;
-  console.log();
 
   const alreadycreated = await userModel.findOne({ email });
   if (alreadycreated) {
@@ -104,16 +108,6 @@ app.post("/api/signup", async (req, res) => {
       .json({ message: "Email already available please log in" });
   }
 
-  // const hashed = await bcrypt.hash(password, salt);
-
-  // const user = await userModel.create({
-  //   name,
-  //   username,
-  //   email,
-  //   password: hashed,
-  //   bio,
-  //   location,
-  // });
   const salt = await bcrypt.genSalt(10);
   const hashedPasswd = await bcrypt.hash(password, salt);
   try {
@@ -139,6 +133,7 @@ app.post("/api/signup", async (req, res) => {
         password: hashedPasswd,
         bio,
         location,
+        pfp: null,
       },
     });
   } catch (error) {
@@ -281,31 +276,81 @@ app.get("/api/index", protectedroute, async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 });
+// multer starts from here
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "./public/temp");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+
+    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueName + ext);
+  },
+});
+const upload = multer({
+  storage,
+});
 app.get("/api/edit", protectedroute, (req, res) => {
   const { name, username, bio, location } = req.user;
   return res.status(200).json({ name, username, bio, location });
 });
-app.post("/api/edit", protectedroute, async (req, res) => {
+
+const uploadOnCloudinary = async (localFilePath) => {
   try {
-    const { name, username, bio, location } = req.body;
-    const id = req.user._id;
-    const editedUser = await userModel
-      .findOneAndUpdate(
-        id,
-        {
-          $set: { name, username, bio, location },
-        },
-        { new: true, runValidators: true },
-      )
-      .select("name username bio location");
+    if (!localFilePath) return null;
+    // uploading the file to the cloudinary
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+    });
+    // now the file has been uploaded successfully
+    // delete the file from the local temp folder
 
-    return res.status(201).json({ success: "ok" });
-
-    // return res.status(200).json({ name, username, bio, location });
+    fs.unlinkSync(localFilePath);
+    return response;
   } catch (error) {
-    console.log(error);
+    fs.unlinkSync(localFilePath);
+    return null;
   }
-});
+};
+
+app.post(
+  "/api/edit",
+  upload.single("avatar"),
+  protectedroute,
+  async (req, res) => {
+    try {
+      const { name, username, bio, location } = req.body;
+      const id = req.user._id;
+      let avatarUrl;
+      if (req.file) {
+        const cloudinaryResponse = await uploadOnCloudinary(req.file.path);
+        if (cloudinaryResponse) {
+          avatarUrl = cloudinaryResponse.secure_url;
+        }
+      }
+      const editedUser = await userModel
+        .findOneAndUpdate(
+          id,
+          {
+            $set: { name, username, bio, location, pfp: avatarUrl },
+          },
+          { new: true, runValidators: true },
+        )
+        .select("name username bio location");
+
+      return res.status(200).json({ name, username, bio, location });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+);
+
 app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
   try {
     const { id } = req.params; // Extract id from params object

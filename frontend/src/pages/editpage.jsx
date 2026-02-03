@@ -73,9 +73,13 @@ const AuthPage = ({ mode }) => {
               onSubmit={async (e) => {
                 setLoading(true);
                 e.preventDefault();
-                const data = Object.fromEntries(new FormData(e.target));
+                const formData = new FormData(e.target);
                 try {
-                  const response = await api.post("/api/edit", data);
+                  const response = await api.post("/api/edit", formData, {
+                    headers: {
+                      "Content-Type": "multipart/form-data",
+                    },
+                  });
                   if (response.status === 201) {
                     setTimeout(() => {
                       navigate("/profile");
@@ -88,6 +92,7 @@ const AuthPage = ({ mode }) => {
             >
               {!isLogin && (
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Input type="file" accept="image/*" name="avatar" />
                   <Input
                     type="text"
                     placeholder="name"
@@ -153,15 +158,17 @@ const AuthPage = ({ mode }) => {
               </button>
               <button
                 className={`
-                  bg-red-500  hover:bg-[#5b409d] cursor-pointer
+                  bg-red-500  hover:bg-red-600 cursor-pointer
                   px-3 py-3 rounded-md flex items-center justify-center gap-3 border-0 outline-none focus:outline focus:ring-0 focus:border-0 outline-[#b3acc7] ring-0 focus-visible:outline `}
-                type="submit"
-                onClick={() => {
+                type="button"
+                onClick={async () => {
                   try {
-                    const response = api.get("/api/logout");
-                  } catch (error) {}
+                    await api.get("/api/logout");
+                    navigate("/");
+                  } catch (error) {
+                    console.log(error);
+                  }
                 }}
-                // disabled={loading}
               >
                 logOut?
                 {loading ? <Spinner /> : ""}

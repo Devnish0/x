@@ -42,8 +42,9 @@ const userSchema = new mongoose.Schema(
     location: String,
     isAdmin: { type: Boolean, default: false },
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "post" }], // fix ref
+    pfp: String,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("user", userSchema);
