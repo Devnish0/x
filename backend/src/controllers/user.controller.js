@@ -1,42 +1,67 @@
+import userModel from "../models/userModel.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/apiResponse.js";
 
-const registerUser = asyncHandler(async (req, res) => {
-  const { name, username, email, password, bio, location } = req.body;
-
-  // checking for empty field
-  if (!name || !username || !email || !password) {
-    throw new ApiError(400, "All fields are required");
-  }
-  // checking for already existing user
-  const alreadycreated = await userModel.findOne({ email });
-  if (alreadycreated) {
-    throw new ApiError(400, "User already exists");
-  }
-  // generating otp and sending email
-  const otpHash = generateOTP();
-  const data = await resend.emails.send({
-    from: "no-reply@nishank.dev",
-    to: email,
-    subject: "Your OTP Code",
-    text: `Here is your OTP code: ${otpHash}`,
+const userProfile = asyncHandler(async (req, res) => {
+  // Populate posts when fetching user profile
+  const user = await userModel.findById(req.user._id).populate({
+    path: "posts",
+    options: { sort: { createdAt: -1 } },
+    populate: { path: "user", select: "name username isAdmin" },
   });
-
-  const otpdata = await otpModel.create({
+  const {
+    _id,
+    name,
+    username,
     email,
-    otpHash,
-    otpExpires: Date.now() + 300000,
-    otpAttempts: 0,
-    signupData: {
-      name,
-      username,
-      email,
-      password,
-      bio,
-      location,
-      pfp: null,
-    },
-  });
-  res.status(201).json(new ApiResponse(201, true, "Otp sent to email"));
+    createdAt,
+    followers,
+    following,
+    posts,
+    isAdmin,
+    bio,
+    location,
+  } = user;
+  const userProfile = {
+    id: _id,
+    name,
+    username,
+    email,
+    createdAt,
+    followers,
+    following,
+    posts,
+    isAdmin,
+    bio,
+    location,
+  };
+  res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        { user: userProfile },
+        "profile Fetched Successfully"
+      )
+    );
+});
+const editUserProfile = asyncHandler(async (req, res) => {
+  const { name, username, bio, location } = req.body;
+  const id = req.user._id;
+  const editedUser = await userModel
+    .findByIdAndUpdate(
+      id,
+      {
+        $set: { name, username, bio, location },
+      },
+      { new: true, runValidators: true }
+    )
+    .select("name username bio location");
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { user: editedUser }, "edit data sent succesfully")
+    );
 });
 
-export { registerUser };
+export { userProfile, editUserProfile };

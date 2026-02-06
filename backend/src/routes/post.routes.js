@@ -1,18 +1,14 @@
-import postModel from "../models/postModel";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Router } from "express";
+import {
+  createPost,
+  specificPost,
+  deletePost,
+} from "../controllers/post.controller.js";
 
-const postCreate = asyncHandler(async (req, res) => {
-  const userId = req.user._id;
-  const data = req.body.text;
-  const post = await postModel.create({ user: userId, data });
-  await userModel.findByIdAndUpdate(
-    userId,
-    { $push: { posts: post._id } },
-    { new: true }
-  );
-  res
-    .status(201)
-    .json(new ApiResponse(201, { posts }, "post created successfully"));
-});
+const router = Router();
 
-export {};
+router.route("/create").post(createPost);
+router.route("/fetch/:id").get(specificPost);
+router.route("/deletepost/:id").delete(deletePost);
+
+export default router;

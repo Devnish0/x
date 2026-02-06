@@ -14,7 +14,7 @@ const Postpage = () => {
     const fetchpost = async () => {
       try {
         setLoading(true);
-        const response = await api.get(`/api/post/${id}`);
+        const response = await api.get(`/api/post/fetch/${id}`);
         setPost(response.data.data.post);
       } catch (error) {
         console.log(error);

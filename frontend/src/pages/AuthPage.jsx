@@ -98,7 +98,7 @@ const SignupForm = ({ loading, setLoading, setAuthStep }) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
     try {
-      const response = await api.post("/api/signup", data);
+      const response = await api.post("/api/auth/signup", data);
       if (response.status === 201) {
         setAuthStep("otp");
       }
@@ -166,7 +166,7 @@ const LoginForm = ({ loading, setLoading }) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
     try {
-      const response = await api.post("/api/login", data);
+      const response = await api.post("/api/auth/login", data);
       if (response.status === 201) {
         setTimeout(() => {
           navigate("/");
@@ -207,7 +207,7 @@ const OTPForm = ({ loading, setLoading, setAuthStep }) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(e.target));
     try {
-      const response = await api.post("/api/verify", data);
+      const response = await api.post("/api/auth/verify", data);
       if (response.status === 201) {
         setTimeout(() => {
           navigate("/");

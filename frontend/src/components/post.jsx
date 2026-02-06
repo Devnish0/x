@@ -39,9 +39,9 @@ export const Post = ({
   return (
     <div
       className="flex h-auto w-full px-3 bg-[#191919] cursor-pointer py-2 border-b border-zinc-600 "
-      onClick={() => {
-        navigate(`/post/${_id}`);
-      }}
+      // onClick={() => {
+      //   navigate(`/post/${_id}`);
+      // }}
     >
       <div className="h-full w-12">
         <div className="flex justify-center items-center">

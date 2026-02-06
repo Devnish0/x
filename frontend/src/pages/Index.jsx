@@ -19,7 +19,7 @@ export const Index = () => {
     const fetchposts = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/api/index");
+        const response = await api.get("api/feed/index");
         const posts = response.data.data.posts;
         setInput(posts);
       } catch (error) {

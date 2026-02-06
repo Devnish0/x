@@ -6,13 +6,16 @@ import cookieparser from "cookie-parser";
 import cors from "cors";
 import { asyncHandler } from "./utils/asyncHandler.js";
 import { ApiResponse } from "./utils/apiResponse.js";
+import postRouter from "./routes/post.routes.js";
 import userModel from "./models/userModel.js";
 import postModel from "./models/postModel.js";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import feedRouter from "./routes/feed.routes.js";
+import jwt from "jsonwebtoken";
 import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 const app = express();
 const allowedOrigins =
@@ -35,8 +38,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser());
-
-// auth routes
 
 const protectedroute = async (req, res, next) => {
   const jwtToken = req.cookies.token;
@@ -65,95 +66,10 @@ const protectedroute = async (req, res, next) => {
 };
 
 app.use("/api/auth", authRouter);
+app.use("/api/post", protectedroute, postRouter);
 app.use("/api/feed", protectedroute, feedRouter);
-
-app.post(
-  "/api/comment",
-  protectedroute,
-  asyncHandler((req, res) => {
-    console.log("lol");
-    res.status(201).json(new ApiResponse(201, "comment route hit"));
-  })
-);
-
-app.get(
-  "/api/profile",
-  protectedroute,
-  asyncHandler(async (req, res) => {
-    // Populate posts when fetching user profile
-    const user = await userModel.findById(req.user._id).populate({
-      path: "posts",
-      options: { sort: { createdAt: -1 } },
-      populate: { path: "user", select: "name username isAdmin" },
-    });
-    const {
-      _id,
-      name,
-      username,
-      email,
-      createdAt,
-      followers,
-      following,
-      posts,
-      isAdmin,
-      bio,
-      location,
-    } = user;
-    const userProfile = {
-      id: _id,
-      name,
-      username,
-      email,
-      createdAt,
-      followers,
-      following,
-      posts,
-      isAdmin,
-      bio,
-      location,
-    };
-    res
-      .status(201)
-      .json(
-        new ApiResponse(
-          201,
-          { user: userProfile },
-          "profile Fetched Successfully"
-        )
-      );
-  })
-);
-app.get(
-  "/api/post/:id",
-  protectedroute,
-  asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const post = await postModel
-      .findOne({ _id: id })
-      .populate("user", "username name isAdmin");
-    res
-      .status(201)
-      .json(new ApiResponse(201, { post }, "Post fetched successfully"));
-  })
-);
-// completed
-app.post(
-  "/api/create",
-  protectedroute,
-  asyncHandler(async (req, res) => {
-    const userId = req.user._id;
-    const data = req.body.text;
-    const post = await postModel.create({ user: userId, data });
-    await userModel.findByIdAndUpdate(
-      userId,
-      { $push: { posts: post._id } },
-      { new: true }
-    );
-    res
-      .status(201)
-      .json(new ApiResponse(201, { posts }, "post created successfully"));
-  })
-);
+app.use("/api/user", protectedroute, userRouter);
+// app.use("/api/comment", protectedroute, commentRouter);
 
 // multer starts from here
 cloudinary.config({
@@ -174,10 +90,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
   storage,
-});
-app.get("/api/edit", protectedroute, (req, res) => {
-  const { name, username, bio, location } = req.user;
-  return res.status(200).json({ name, username, bio, location });
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
@@ -229,39 +141,5 @@ app.post(
     }
   }
 );
-
-app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
-  try {
-    const { id } = req.params; // Extract id from params object
-
-    // Check if post exists and user owns it
-    const post = await postModel.findById(id);
-    if (!post) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Post not found" });
-    }
-
-    // Verify user owns the post
-    if (post.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: "Unauthorized" });
-    }
-
-    // Delete post
-    await postModel.findByIdAndDelete(id);
-
-    // Remove post ID from user's posts array
-    await userModel.findByIdAndUpdate(
-      req.user._id,
-      { $pull: { posts: id } },
-      { new: true }
-    );
-
-    res.status(200).json({ success: true, message: "Post deleted" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
 
 export default app;

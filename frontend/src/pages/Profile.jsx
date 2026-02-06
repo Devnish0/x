@@ -13,14 +13,14 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const deleteHandeler = (postid) => {
-    console.log(postid);
+  const deleteHandeler = async (postid) => {
+    const response = await api.delete(`/api/post/deletepost/${postid}`);
   };
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/api/profile");
+        const response = await api.get("/api/user/profile");
         setUserdata(response.data.data.user);
       } catch (error) {
         setError(error.message || "error in fetching your profile");

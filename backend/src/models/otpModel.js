@@ -21,12 +21,8 @@ const otpSchema = new mongoose.Schema({
   },
 });
 
-// Pre-save hook: hash password and OTP
+// Pre-save hook: hash OTP only
 otpSchema.pre("save", async function () {
-  if (this.isModified("signupData.password")) {
-    this.signupData.password = await bcrypt.hash(this.signupData.password, 10);
-  }
-
   if (this.isModified("otpHash")) {
     this.otpHash = await bcrypt.hash(this.otpHash, 10);
   }

@@ -17,8 +17,8 @@ const AuthPage = ({ mode }) => {
     (async () => {
       try {
         setLoading(true);
-        const response = await api.get("/api/edit");
-        setData(response.data);
+        const response = await api.get("/api/user/edit");
+        setData(response.data?.data?.user || {});
       } catch (error) {
         console.log(error);
         setError(error);
@@ -73,14 +73,15 @@ const AuthPage = ({ mode }) => {
               onSubmit={async (e) => {
                 setLoading(true);
                 e.preventDefault();
-                const formData = new FormData(e.target);
+                const payload = {
+                  name: data.name || "",
+                  username: data.username || "",
+                  bio: data.bio || "",
+                  location: data.location || "",
+                };
                 try {
-                  const response = await api.post("/api/edit", formData, {
-                    headers: {
-                      "Content-Type": "multipart/form-data",
-                    },
-                  });
-                  if (response.status === 201) {
+                  const response = await api.post("/api/user/edit", payload);
+                  if (response.status === 200) {
                     setTimeout(() => {
                       navigate("/profile");
                     }, 1000);
@@ -92,11 +93,10 @@ const AuthPage = ({ mode }) => {
             >
               {!isLogin && (
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                  <Input type="file" accept="image/*" name="avatar" />
                   <Input
                     type="text"
                     placeholder="name"
-                    value={data.name}
+                    value={data.name || ""}
                     className="w-full "
                     name="name"
                     onChange={(e) => {
@@ -108,7 +108,7 @@ const AuthPage = ({ mode }) => {
                   <Input
                     type="text"
                     placeholder="username"
-                    value={data.username}
+                    value={data.username || ""}
                     className="w-full "
                     name="username"
                     onChange={(e) => {
@@ -123,7 +123,7 @@ const AuthPage = ({ mode }) => {
                 type="text"
                 placeholder="bio"
                 name="bio"
-                value={data.bio}
+                value={data.bio || ""}
                 onChange={(e) => {
                   setData((prev) => {
                     return { ...prev, bio: e.target.value };
@@ -134,20 +134,18 @@ const AuthPage = ({ mode }) => {
                 type="text"
                 placeholder="location"
                 name="location"
-                value={data.location}
+                value={data.location || ""}
                 onChange={(e) => {
                   setData((prev) => {
                     return { ...prev, location: e.target.value };
                   });
                 }}
               />
-              <div className="flex gap-3 py-6 sm:py-8 lg:py-12">
+              <div className="flex gap-3 py-6 sm:py-8 lg:py-12 ">
                 <ChecBox placeholder="I agree to the" />
               </div>
               <button
                 className={`
-                  
-                  
                   bg-[#6D54B3]  hover:bg-[#5b409d] cursor-pointer
                   px-3 py-3 rounded-md flex items-center justify-center gap-3 border-0 outline-none focus:outline focus:ring-0 focus:border-0 outline-[#b3acc7] ring-0 focus-visible:outline `}
                 type="submit"
@@ -163,7 +161,7 @@ const AuthPage = ({ mode }) => {
                 type="button"
                 onClick={async () => {
                   try {
-                    const response = await api.get("/api/logout");
+                    const response = await api.get("/api/auth/logout");
                     navigate("/");
                   } catch (error) {
                     console.log(error);

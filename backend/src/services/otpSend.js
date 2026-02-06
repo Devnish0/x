@@ -8,6 +8,7 @@ const sendOtpEmail = asyncHandler(async ({ email, otpHash }) => {
     subject: "Your OTP Code",
     text: `Here is your OTP code: ${otpHash}`,
   });
+  return data;
 });
 
 export { sendOtpEmail };
