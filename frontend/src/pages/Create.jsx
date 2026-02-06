@@ -11,8 +11,11 @@ const Create = ({ oncross, name = "hey there" }) => {
   const submitHandler = async () => {
     try {
       const response = await api.post("/api/create", { text: text });
+      console.log(response.data);
       oncross();
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

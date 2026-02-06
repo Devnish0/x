@@ -229,7 +229,7 @@ const OTPForm = ({ loading, setLoading, setAuthStep }) => {
         type="text"
         placeholder="Enter OTP"
         name="otp"
-        maxLength="4"
+        maxLength="6"
         required
       />
       {error && (

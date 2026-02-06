@@ -20,7 +20,7 @@ export const Index = () => {
       try {
         setLoading(true);
         const response = await api.get("/api/index");
-        const posts = response.data.posts;
+        const posts = response.data.data.posts;
         setInput(posts);
       } catch (error) {
         setError(error);

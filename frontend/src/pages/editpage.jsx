@@ -163,7 +163,7 @@ const AuthPage = ({ mode }) => {
                 type="button"
                 onClick={async () => {
                   try {
-                    await api.get("/api/logout");
+                    const response = await api.get("/api/logout");
                     navigate("/");
                   } catch (error) {
                     console.log(error);

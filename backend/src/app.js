@@ -1,9 +1,12 @@
 import dotenv from "dotenv";
-
 dotenv.config();
+import path from "path";
 import express from "express";
 import cookieparser from "cookie-parser";
 import cors from "cors";
+import { asynchandler } from "./utils/asynchandler.js";
+import { ApiError } from "./utils/apiError.js";
+import { ApiResponse } from "./utils/apiResponse.js";
 import userModel from "./models/userModel.js";
 import { otpModel } from "./models/otpModel.js";
 import { Resend } from "resend";
@@ -16,13 +19,11 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 const app = express();
-import path from "path";
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
     ? ["https://intiger.nishank.dev"]
     : ["http://localhost:5173"];
-
 const corsOptions = {
   origin: function (requestOrigin, callback) {
     if (!requestOrigin || allowedOrigins.includes(requestOrigin)) {
@@ -34,9 +35,8 @@ const corsOptions = {
   credentials: true,
 };
 app.set("trust proxy", 1);
-
+// setting up the middlewares
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieparser());
@@ -68,21 +68,25 @@ const protectedroute = async (req, res, next) => {
     return res.status(401).json({ success: false, message: "Invalid token" });
   }
 };
-app.post("/api/comment", protectedroute, (req, res) => {
-  console.log("lol");
-  res.status(201).json({ success: true });
-});
+app.post(
+  "/api/comment",
+  protectedroute,
+  asynchandler((req, res) => {
+    console.log("lol");
+    res.status(201).json(new ApiResponse(201, "comment route hit"));
+  })
+);
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await userModel.findOne({ email });
-  if (!user) return res.status(401).json({ success: false });
+  if (!user) throw new ApiError(401, "invalid credentials");
 
-  const iscorrect = await bcrypt.compare(password, user.password);
-  if (!iscorrect) return res.status(401).json({ success: false });
+  const iscorrect = await user.isPasswordCorrect(password); // this is the mongoose middleware
+  if (!iscorrect) throw new ApiError(401, "invalid credentials");
 
   const token = jwt.sign(
     { exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60, data: email },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET
   );
 
   res
@@ -95,109 +99,120 @@ app.post("/api/login", async (req, res) => {
     })
     .json({ success: true });
 });
-const generateOTP = () => {
-  return Math.floor(Math.random() * 9000).toString();
+const generateOTP = (length = 6) => {
+  const max = 10 ** length;
+  const n = Math.floor(Math.random() * max);
+  return n.toString().padStart(length, "0");
 };
-app.post("/api/signup", async (req, res) => {
-  const { name, username, email, password, bio, location } = req.body;
+app.post(
+  "/api/signup",
+  asynchandler(async (req, res) => {
+    const { name, username, email, password, bio, location } = req.body;
 
-  const alreadycreated = await userModel.findOne({ email });
-  if (alreadycreated) {
-    return res
-      .status(401)
-      .json({ message: "Email already available please log in" });
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  const hashedPasswd = await bcrypt.hash(password, salt);
-  try {
-    const otp = generateOTP();
+    // checking for empty field
+    if (!name || !username || !email || !password) {
+      throw new ApiError(400, "All fields are required");
+    }
+    // checking for already existing user
+    const alreadycreated = await userModel.findOne({ email });
+    if (alreadycreated) {
+      throw new ApiError(400, "User already exists");
+    }
+    // generating otp and sending email
+    const otpHash = generateOTP();
     const data = await resend.emails.send({
       from: "no-reply@nishank.dev",
       to: email,
       subject: "Your OTP Code",
-      text: `Here is your OTP code: ${otp}`,
+      text: `Here is your OTP code: ${otpHash}`,
     });
-    const salt = await bcrypt.genSalt(10);
-    const hashedOTP = await bcrypt.hash(otp, salt);
 
     const otpdata = await otpModel.create({
       email,
-      otpHash: hashedOTP,
+      otpHash,
       otpExpires: Date.now() + 300000,
       otpAttempts: 0,
       signupData: {
         name,
         username,
         email,
-        password: hashedPasswd,
+        password,
         bio,
         location,
         pfp: null,
       },
     });
-  } catch (error) {
-    console.log(error);
-  }
-  res.status(201).json({ message: "okay" });
-});
-app.post("/api/verify", async (req, res) => {
-  const { otp } = req.body;
+    res.status(201).json(new ApiResponse(201, true, "Otp sent to email"));
+  })
+);
+app.post(
+  "/api/verify",
+  asynchandler(async (req, res) => {
+    const { otp } = req.body;
 
-  const record = await otpModel.findOne({}).sort({ _id: -1 }).limit(1);
-  // console.log("record:", record);
-  if (!record) {
-    return res.status(400).json({ message: "invalid OTP" });
-  }
-  if (record.otpExpires < Date.now()) {
-    return res.status(400).json({ message: "otp expired" });
-  }
-  if (record.otpAttemptes >= 3) {
-    return res.status(400).json({ message: "enough otp for today" });
-  }
-  const isValid = await bcrypt.compare(otp, record.otpHash);
-  if (!isValid) {
-    record.otpAttempts += 1;
-    await record.save();
-    return res.status(400).json({ message: "invalid OTP" });
-  }
-  const { name, username, email, password, bio, location } = record.signupData;
-  const createdUser = userModel.create({
-    name,
-    username,
-    email,
-    password,
-    bio,
-    location,
-  });
-
-  const token = jwt.sign(
-    { exp: Math.floor(Date.now() / 1000) + 60 * 60, data: email },
-    process.env.JWT_SECRET,
-  );
-
-  res
-    .status(201)
-    .cookie("token", token, {
-      httpOnly: true,
-      secure: true, // set true when on HTTPS
-      sameSite: "none", // use "none" + secure:true if cross-site HTTPS
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
-    .json({ success: true });
-});
+    const record = await otpModel.findOne({}).sort({ _id: -1 }).limit(1);
+    if (!record) {
+      throw new ApiError(400, "no otp record found");
+    }
+    if (record.otpExpires < Date.now()) {
+      throw new ApiError(400, "otp expired");
+    }
+    if (record.otpAttempts >= 3) {
+      throw new ApiError(400, "otp attempts exceeded");
+    }
+    const isValid = await record.isOtpCorrect(otp);
+    // bcrypt.compare(otp, record.otpHash);
+    if (!isValid) {
+      record.otpAttempts += 1;
+      await record.save();
+      throw new ApiError(400, "incorrect OTP");
+    }
+    const { name, username, email, password, bio, location } =
+      record.signupData;
+    // if everything goes right create the user
+    const createdUser = await userModel.create({
+      name,
+      username,
+      email,
+      password,
+      bio,
+      location,
+    });
+    // assigning a jwt token
+    const token = jwt.sign(
+      { exp: Math.floor(Date.now() / 1000) + 60 * 60, data: email },
+      process.env.JWT_SECRET
+    );
+    // setting the token in cookie
+    res
+      .status(201)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: true, // set true when on HTTPS
+        sameSite: "none", // use "none" + secure:true if cross-site HTTPS
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json(new ApiResponse(201, true, "User created successfully"));
+  })
+);
 // logout route
-app.get("/api/logout", protectedroute, (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
-  res.status(201).json({ success: true });
-});
+app.get(
+  "/api/logout",
+  protectedroute,
+  asynchandler(async (req, res) => {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.status(201).json(new ApiResponse(201, true, "Logged out successfully"));
+  })
+);
 
-app.get("/api/profile", protectedroute, async (req, res) => {
-  try {
+app.get(
+  "/api/profile",
+  protectedroute,
+  asynchandler(async (req, res) => {
     // Populate posts when fetching user profile
     const user = await userModel.findById(req.user._id).populate({
       path: "posts",
@@ -217,65 +232,75 @@ app.get("/api/profile", protectedroute, async (req, res) => {
       bio,
       location,
     } = user;
-    res.json({
-      success: true,
-      user: {
-        id: _id,
-        name,
-        username,
-        email,
-        createdAt,
-        followers,
-        following,
-        posts,
-        isAdmin,
-        bio,
-        location,
-      },
-    });
-  } catch (error) {
-    console.log(error);
+    const userProfile = {
+      id: _id,
+      name,
+      username,
+      email,
+      createdAt,
+      followers,
+      following,
+      posts,
+      isAdmin,
+      bio,
+      location,
+    };
+    res
+      .status(201)
+      .json(
+        new ApiResponse(
+          201,
+          { user: userProfile },
+          "profile Fetched Successfully"
+        )
+      );
+  })
+);
+app.get(
+  "/api/post/:id",
+  protectedroute,
+  asynchandler(async (req, res) => {
+    const { id } = req.params;
+    const post = await postModel
+      .findOne({ _id: id })
+      .populate("user", "username name isAdmin");
+    res
+      .status(201)
+      .json(new ApiResponse(201, { post }, "Post fetched successfully"));
+  })
+);
 
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-app.get("/api/post/:id", protectedroute, async (req, res) => {
-  const { id } = req.params;
-  const post = await postModel
-    .findOne({ _id: id })
-    .populate("user", "username name isAdmin");
-  res.status(201).json(post);
-});
-app.post("/api/post", protectedroute, async (req, res) => {});
-
-// Fix pushing post ID
-app.post("/api/create", protectedroute, async (req, res) => {
-  const userId = req.user._id;
-  const data = req.body.text;
-  try {
+app.post(
+  "/api/create",
+  protectedroute,
+  asynchandler(async (req, res) => {
+    const userId = req.user._id;
+    const data = req.body.text;
     const post = await postModel.create({ user: userId, data });
     await userModel.findByIdAndUpdate(
       userId,
       { $push: { posts: post._id } },
-      { new: true },
+      { new: true }
     );
-    res.status(201).json({ success: true, post });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-app.get("/api/index", protectedroute, async (req, res) => {
-  try {
+    res
+      .status(201)
+      .json(new ApiResponse(201, { posts }, "post created successfully"));
+  })
+);
+app.get(
+  "/api/index",
+  protectedroute,
+  asynchandler(async (req, res) => {
     const posts = await postModel
       .find()
       .populate("user", "username name isAdmin")
       .sort({ createdAt: -1 });
-    res.status(200).json({ success: true, posts });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
+    res.status(200).json(
+      // new ApiResponse(200, true, { posts }, "Posts fetched successfully")
+      new ApiResponse(200, { posts }, "Posts fetched successfully")
+    );
+  })
+);
 // multer starts from here
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -340,7 +365,7 @@ app.post(
           {
             $set: { name, username, bio, location, pfp: avatarUrl },
           },
-          { new: true, runValidators: true },
+          { new: true, runValidators: true }
         )
         .select("name username bio location");
 
@@ -348,7 +373,7 @@ app.post(
     } catch (error) {
       console.log(error);
     }
-  },
+  }
 );
 
 app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
@@ -375,7 +400,7 @@ app.delete("/api/deletepost/:id", protectedroute, async (req, res) => {
     await userModel.findByIdAndUpdate(
       req.user._id,
       { $pull: { posts: id } },
-      { new: true },
+      { new: true }
     );
 
     res.status(200).json({ success: true, message: "Post deleted" });

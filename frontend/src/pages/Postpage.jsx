@@ -15,8 +15,7 @@ const Postpage = () => {
       try {
         setLoading(true);
         const response = await api.get(`/api/post/${id}`);
-        setPost(response.data);
-        console.log(response.data);
+        setPost(response.data.data.post);
       } catch (error) {
         console.log(error);
       } finally {
@@ -41,7 +40,7 @@ const Postpage = () => {
           navigate("/");
         }}
       >
-        <span className="pointer-fine:">backs</span>
+        <span className="cursor-pointer">back</span>
         <span className="">Post</span>
       </div>
       <div className="h-10"></div>

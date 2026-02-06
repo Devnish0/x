@@ -21,7 +21,7 @@ const Profile = () => {
       try {
         setLoading(true);
         const response = await api.get("/api/profile");
-        setUserdata(response.data.user);
+        setUserdata(response.data.data.user);
       } catch (error) {
         setError(error.message || "error in fetching your profile");
         console.error(error);

@@ -1,42 +1,10 @@
-import dotenv from "dotenv";
-dotenv.config();
-import mongoose from "mongoose";
+import { connectDB } from "./db/index.js";
 import app from "./app.js";
 
-const PORT = process.env.PORT || 5000;
-const DBURL =
-  process.env.NODE_ENV === "production"
-    ? process.env.DBURL
-    : "mongodb://127.0.0.1:27017/intiger";
-
-// Validate environment variables
-if (!DBURL) {
-  console.error("❌ Error: DBURL is not defined in .env file");
-  process.exit(1);
-}
-
-// Connect to MongoDB
-mongoose
-  .connect(DBURL)
-  .then(() => {
-    console.log("✅ Database connected successfully");
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running at http://localhost:${PORT}`);
-      console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-    });
-  })
-  .catch((err) => {
-    console.error("❌ Database connection failed:", err.message);
-    process.exit(1);
+connectDB().then(() => {
+  app.listen(process.env.PORT, () => {
+    console.log(
+      `the server is running at port https://localhost:${process.env.PORT}`
+    );
   });
-
-// Handle unhandled errors
-process.on("unhandledRejection", (err) => {
-  console.error("❌ Unhandled Rejection:", err);
-  process.exit(1);
-});
-
-process.on("uncaughtException", (err) => {
-  console.error("❌ Uncaught Exception:", err);
-  process.exit(1);
 });
