@@ -2,7 +2,7 @@
 // means takes a function inside a function
 // this just means
 
-// const asynchandler = () => {
+// const asyncHandler = () => {
 // () => {};
 // };
 
@@ -10,10 +10,11 @@
 // ? to avoid writing try catch block everytime
 // ? and implimenting a project wise try catch error block
 
-const asynchandler = (fn) => async (req, res, next) => {
+const asyncHandler = (fn) => async (req, res, next) => {
   try {
     await fn(req, res, next);
   } catch (error) {
+    console.log("ERROR", error);
     res.status(error.statusCode || 500).json({
       success: false,
       message: "from AS: " + error.message,
@@ -21,4 +22,4 @@ const asynchandler = (fn) => async (req, res, next) => {
   }
 };
 
-export { asynchandler };
+export { asyncHandler };
