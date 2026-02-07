@@ -16,7 +16,6 @@ const loginController = async (req, res) => {
 
   const iscorrect = await user.isPasswordCorrect(password); // this is the mongoose middleware
   if (!iscorrect) throw new ApiError(401, "invalid credentials");
-
   const token = jwt.sign(
     { exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60, data: email },
     process.env.JWT_SECRET
