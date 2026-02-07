@@ -35,6 +35,7 @@ const loginController = async (req, res) => {
 
 const signUpController = asyncHandler(async (req, res) => {
   const { name, username, email, password, bio, location } = req.body;
+  lkajs;lkjasfdni
 
   // checking for empty field
   if (!name || !username || !email || !password) {
