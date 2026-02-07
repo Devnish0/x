@@ -1,10 +1,7 @@
-import userModel from "./models/userModel.js";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
-
-import jwt from "jsonwebtoken";
 
 // multer starts from here
 cloudinary.config({

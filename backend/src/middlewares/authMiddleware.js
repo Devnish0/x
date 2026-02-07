@@ -1,3 +1,6 @@
+import userModel from "../models/userModel.js";
+import jwt from "jsonwebtoken";
+
 const protectedroute = async (req, res, next) => {
   const jwtToken = req.cookies.token;
   if (!jwtToken)
