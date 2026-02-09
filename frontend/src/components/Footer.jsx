@@ -15,8 +15,8 @@ const Footer = () => {
           {" "}
           home
         </span>
-        <span className="cursor-pointer text-zinc-600">search</span>
-        <span className="cursor-pointer text-zinc-600"> notification</span>
+        {/* <span className="cursor-pointer text-zinc-600">search</span>
+        <span className="cursor-pointer text-zinc-600"> notification</span> */}
         <span
           className="cursor-pointer"
           onClick={() => {

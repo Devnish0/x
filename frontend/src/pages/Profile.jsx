@@ -53,8 +53,9 @@ const Profile = () => {
   return (
     <div className="w-full min-h-screen bg-[#191919] pb-15 z-2 text-white flex flex-col">
       {/* Header */}
-      <div className="flex bg-pink-500 w-full h-32 relative items-center justify-center">
-        back
+      <div className="flex text-black font-mono bg-amber-100 w-full h-32 relative items-center text-[10px] lg:text-xl justify-center">
+        {/* back */}
+        until death every defeat is psychological...
         <div className="w-19 h-19 ml-2 absolute left-0.5 -bottom-13">
           <img
             src={defaultpng}

@@ -73,10 +73,10 @@ export const Post = ({
         <div className="px-1 font-sans w-full h-auto">{data}</div>
 
         <div className="w-full h-6 mt-2 flex justify-around">
-          <span className="h-full flex items-center gap-1">
+          {/* <span className="h-full flex items-center gap-1">
             <img src={commentpng} className="h-full" alt="" />
             {comments?.length || 0}
-          </span>
+          </span> */}
           <span
             className="h-full flex items-center gap-1"
             onClick={() => {

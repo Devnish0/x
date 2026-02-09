@@ -46,7 +46,7 @@ export const Index = () => {
     );
   }
   return (
-    <div className="m-h-screen w-full bg-black/90 flex flex-col pt-14 pb-15 text-white  ">
+    <div className="min-h-screen w-full bg-black/90 flex flex-col pt-14 pb-15 text-white  ">
       {show ? (
         <Create
           oncross={() => {
@@ -64,9 +64,9 @@ export const Index = () => {
             />
           )}
           <div className="w-full border-b flex items-center justify-around text-zinc-500  border-zinc-300 pb-2">
-            <span> For you</span>
+            {/* <span> For you</span>
             <span> Following</span>
-            <span> Build in public</span>
+            <span> Build in public</span> */}
           </div>
           <div className="h-full w-full">
             {input.length === 0 ? (
