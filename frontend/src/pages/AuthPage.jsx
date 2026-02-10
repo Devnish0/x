@@ -138,7 +138,7 @@ const SignupForm = ({ loading, setLoading, setAuthStep }) => {
         required
       />
       <div className="flex gap-3 py-6 sm:py-8 lg:py-12">
-        <ChecBox placeholder="I agree to the" />
+        {/* <ChecBox placeholder="I agree to the" /> */}
       </div>
       {error && (
         <div className="w-full border flex items-center justify-center rounded-md h-12 text-red-600 border-red-300">

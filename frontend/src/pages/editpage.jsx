@@ -142,7 +142,7 @@ const AuthPage = ({ mode }) => {
                 }}
               />
               <div className="flex gap-3 py-6 sm:py-8 lg:py-12 ">
-                <ChecBox placeholder="I agree to the" />
+                {/* <ChecBox placeholder="I agree to the" /> */}
               </div>
               <button
                 className={`

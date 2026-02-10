@@ -32,13 +32,13 @@ export const ChecBox = ({ placeholder = "remember me" }) => {
           </svg>
         </span>
 
-        <span className="text-sm">
+        {/* <span className="text-sm">
           {placeholder}
           <span className="underline text-blue-500">
             {" "}
             {"terms and condition"}
           </span>
-        </span>
+        </span> */}
       </label>
     </div>
   );
