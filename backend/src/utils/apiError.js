@@ -15,5 +15,6 @@ class ApiError extends Error {
     }
   }
 }
+// this is a comment
 
 export { ApiError };
